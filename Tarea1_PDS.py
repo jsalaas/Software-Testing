@@ -1,231 +1,228 @@
-# Desarrollo tarea Nº1 Pruebas de Software
-#
-# Se busca realizar una mejora en la estimación de 
-# requerimiento y formas de realizar pruebas, con la ayuda
-# de un compañero.
-# A continuación se deja el código realizado de acuerdo a
-# esta mejora de requerimientos antes mencionada.
+import os
+import string
+import logging
+from time import sleep
 
-#import de librerias
-import os.path
-import datetime
+def clear():
+  # for windows
+  if os.name == 'nt':
+    _ = os.system('cls')
+   # for mac and linux
+  else:
+    _ = os.system('clear')
 
-#Logger para almacenamiento de entradas y salidas por consola
-def logger(mensaje, tipo, reset = 0):
-    texto = open("[DEBUG]_Logs.txt","a")
-    if reset == 1:
-        texto.write("\n####### NEW TEST "+str(datetime.date.today())+" #######\n")
-    elif reset == 2:
-        texto.write("\n####### END TEST "+str(datetime.date.today())+"#######\n")
+logging.basicConfig(filename='example.log', encoding='utf-8', level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+print("Bienvenido al gestor de textos en pila")
+if not os.path.exists('pila.txt'):
+  f = open('pila.txt', 'x')
+  f.close()
+while True:
+  print("Seleccione dentro de las opciones:")
+  print("1. Ingresar texto a la pila")
+  print("2. Quitar texto de pila")
+  print("3. Buscar el texto más largo y el más corto")
+  print("4. Imprimir texto de pila")
+  print("5. Comparar tamaños de textos en la pila")
+  print("6. Salir")
+  opcion = int(input("Opción: "))
+  if opcion == 1:
+    fr = open('pila.txt', 'r')
+    lista = fr.read()
+    fr.close()
+    numPalabras = len(lista.strip().split())
+    if(numPalabras<20):
+      f = open('pila.txt', 'a')
+      if 20-numPalabras == 1:
+        inputuser = input("Ingrese el texto para la pila. Puedes ingresar solo "+str(20-numPalabras)+" texto (sin ninguna puntuacion):")
+      else:
+        inputuser = input("Ingrese el texto para la pila. Puedes ingresar hasta "+str(20-numPalabras)+" textos (sin ninguna puntuacion) separados por espacio:")
+      textos = inputuser.split()
+      textos = textos[:(20-len(lista.strip().split()))]
+      for i in range(len(textos)):
+        textos[i] = textos[i].translate(str.maketrans('','',string.punctuation))
+        textos[i] = textos[i][:100]
+        f.write(textos[i]+' ')
+      f.close()
+      clear()
+      if len(textos) == 1:
+          logging.info('Se ingreso '+str(len(textos))+' texto a la pila.')
+      else:
+          logging.info('Se ingresaron '+str(len(textos))+' textos a la pila.')
+      clear()
     else:
-        #Tipo 0 : Output
-        if tipo == 0:
-            print(mensaje)
-            texto.write("\n["+datetime.datetime.now().strftime("%I:%M:%S %p")+"] Output: "+mensaje+"\n")
-        #Tipo -1: Output pero sin imprimir por pantalla
-        elif tipo == -1:
-            texto.write("\n["+datetime.datetime.now().strftime("%I:%M:%S %p")+"] Output: "+mensaje+"\n")
-        #Tipo 1 : Input
-        elif tipo == 1:
-            texto.write("\n["+datetime.datetime.now().strftime("%I:%M:%S %p")+"] Input: "+mensaje+"\n")
-    texto.close()
-    return
-
-#Carga la pila o la crea en caso de no existir
-def loadBat(battery):
-    file_exists = os.path.exists("bat_savedata.txt")
-    if file_exists:
-        with open("bat_savedata.txt") as f:
-            s = "".join([l.replace("\n","") for l in f]) 
-        s = s.split(";")
-        if len(s) >= 10:
-            for x in range(10):
-                battery.append(s[x])
+      clear()
+      logging.warning('Pila llena. No se pueden ingresar más textos.')
+      clear()
+  elif opcion == 2:
+    with open('pila.txt', 'r+') as file:
+      lista = file.read()
+    lista = lista.strip().split()
+    if len(lista) != 0:
+      lista.pop(-1)
+      f = open('pila.txt', "w")
+      for i in range(len(lista)):
+        f.write(lista[i]+' ')
+      f.close()
+      clear()
+      logging.info('Último elemento de la pila removido (pop).')
+      sleep(1)
+      clear()      
+    else:
+      clear()
+      logging.warning('Pila vacía. No hay textos para eliminar.')
+      sleep(2)
+      clear()
+  elif opcion == 3:
+    f = open('pila.txt', 'r')
+    lista = f.read()
+    f.close()
+    lista = lista.strip().split()
+    if len(lista) != 0:
+      largoMax = 0
+      largoMin = 101
+      indiceMax = -1
+      indiceMin = -1
+      for i in range(len(lista)):
+        if len(lista[i])>largoMax:
+          largoMax = len(lista[i])
+          indiceMax = i
+        if len(lista[i])<largoMin:
+          largoMin = len(lista[i])
+          indiceMin = i
+      if largoMax != largoMin:
+        clear()
+        if largoMax == 1:
+          print("El texto más largo de la pila es \""+lista[indiceMax]+"\" con", largoMax, "caracter")
+        elif largoMax > 1:
+          print("El texto más largo de la pila es \""+lista[indiceMax]+"\" con", largoMax, "caracteres")
+        if largoMin == 1:
+          print("El texto más corto de la pila es \""+lista[indiceMin]+"\" con", largoMin, "caracter")
+        elif largoMin > 1:
+          print("El texto más corto de la pila es \""+lista[indiceMin]+"\" con", largoMin, "caracteres")
+        logging.info('Se mostraron dos textos de longitud máxima y mínima.')
+        sleep(4)
+        clear()
+      else:
+        clear()
+        if indiceMax == indiceMin:
+          print("La pila solamente contiene un texto, por lo que \""+lista[indiceMax]+"\" es el texto más largo y más corto simultaneamente.")
+          logging.info('Se mostró solamente un texto que resulta ser el texto más corto y el más largo a la vez.')
+          sleep(3)
+          clear()
         else:
-            for x in s:
-                battery.append(x)
-            battery = battery + [""]*(10-len(s))
-        logger("[Notificación] Pila recuperada",tipo=0)
-        return battery
+          if largoMax == 1:
+            print("Dentro de la pila, el texto mas largo y el mas corto tienen", largoMax, "caracter, dentro de los cuales, uno de ellos es la palabra \""+lista[indiceMax]+"\"")
+          elif largoMax > 1:
+            print("Dentro de la pila, el texto mas largo y el mas corto tienen", largoMax, "caracteres, dentro de los cuales, uno de ellos es la palabra \""+lista[indiceMax]+"\"")
+          logging.info('En la pila se encuentran solo palabras de un único número de caracteres, por lo que se mostró el primer resultado.')
+          sleep(4)
+          clear()
     else:
-        file = open("bat_savedata.txt", "w")
-        file.close()
-        logger("[Notificación] Archivo de pila creado",tipo=0)
-        return ["","","","","","","","","",""]
-
-#Filtra el texto para poder entregar el resultado
-def filterText(text):
-    res = ''
-    for x in text:
-        if x not in ['a','A','b','B','c','C','d','D','e','E','f','F','g','G','h','H','i','I','j','J','k','K','l','L','m','M','n','N','o','O','p','P','q','Q','r','R','s','S','t','T','u','U','v','V','w','W','x','X','y','Y','z','Z','1','2','3','4','5','6','7','8','9','0',' ']:
-            continue
+      clear()
+      logging.warning('Pila vacía. No hay texto de menor ni de mayor tamaño.')
+  elif opcion == 4:
+    f = open('pila.txt', 'r')
+    lista = f.read()
+    listaSep = lista.strip().split()
+    f.close()
+    clear()
+    if len(listaSep) == 0:
+      logging.warning('Pila vacía. No hay textos para imprimir.')
+      clear()
+    elif len(listaSep) == 1:
+      print("El único texto que se encuentra en la pila es: \""+listaSep[0]+"\"")
+      logging.info('Se imprime el único elemento de la pila.')
+      sleep(3)
+      clear()
+    else:
+      while True:
+        tipoImp = input("¿Deseas una impresión total o parcial? (T/P)? ")
+        if tipoImp == 'T' or tipoImp == "t":
+          logging.info('Se imprime la totalidad de la pila.')
+          print("El texto que hay en la pila es: \""+lista.strip()+"\"")
+          sleep(3)
+          clear()
+          break
+        elif tipoImp == 'P' or tipoImp == "p":
+          while True:
+            posicion = int(input("Escoge la posición del texto que quieres imprimir. Tienes para escoger entre 1 y "+str(len(listaSep))+": "))
+            if posicion not in list(range(1,len(listaSep)+1)):
+              print("Ingresa un valor válido")
+              logging.warning('Se ingresa un índice de impresión inválido')
+              sleep(1)
+              clear()
+            else:
+              break
+          print("El texto que se encuentra en la posición", posicion, "de la pila es: \""+listaSep[posicion-1]+"\"")
+          logging.info('Se imprime el elemento '+posicion+' de la pila')
+          sleep(3)
+          clear()
+          break
         else:
-            res+=x
-    return res
-
-#Obtiene el texto de mayor y menor tamaño
-def majorMinor(battery):
-    temp1 = [[len(battery[x]),x] for x in range(10)]
-    temp1.sort(key = lambda x: x[0])
-    temp = []
-    for x in range(10):
-        if temp1[x][0] != 0:
-            temp.append(temp1[x])
-    if len(temp) == 0:
-        logger("Pila vacía, ingrese un texto para realizar esta función", tipo=0)
-        return
+          clear()
+          print("Debes ingresar una opción válida para el tipo de impresión")
+          logging.warning('Tipo de impresión solicitado no válido.')
+          sleep(2)
+          clear()
+  elif opcion == 5:
+    f = open('pila.txt', 'r')
+    lista = f.read()
+    listaSep = lista.strip().split()
+    f.close()
+    clear()
+    if len(listaSep) == 0:
+      clear()
+      print("La pila se encuentra vacía. No hay textos para comparar.")
+      logging.warning('Pila vacía. No hay textos para comparar.')
+      sleep(2)
+      clear()
+    elif len(listaSep) == 1:
+      clear()
+      print("La pila contiene solo al texto \""+listaSep[0]+"\" por lo que no tiene comparación dentro de la pila.")
+      logging.info('Pila con un solo elemento. No se efectúa comparación.')
+      sleep(2)
+      clear()
     else:
-        i = " ".join(("Texto de MAYOR tamaño ubicado en espacio:",str(temp[-1][1]),"\nCon",str(temp[-1][0]),"caracteres\n","El texto es:",str(battery[temp[-1][1]])))
-        logger(i, tipo = 0)
-        i = " ".join(("\nTexto de MENOR tamaño ubicado en espacio:", str(temp[0][1]),"\nCon",str(temp[0][0]),"caracteres\n","El texto es:",str(battery[temp[0][1]])))
-        logger(i, tipo = 0)
-        return
-
-#imprime el tamaño del texto almacenado en el espacio de la pila según el formato
-def seeBat(pos, battery):
-    if battery[pos] == "":
-        i = (("El texto número", str(pos), "está Vacío\nNo tiene caracteres"))
-        logger(i, tipo = 0)
-        return
-    else:
-        i = " ".join(("El texto número",str(pos),"es:",str(battery[pos]),"\nCon una cantidad de",str(len(battery[pos])),"caracteres"))
-        logger(i, tipo = 0)
-        return
-
-#comparacion de tamaños
-def lenCompare(pos1,pos2,battery):
-    if len(battery[pos1]) > len(battery[pos2]):
-        i = " ".join(("Texto",str(pos1),"es mayor que el texto",str(pos2),"en:",str(len(battery[pos1])-len(battery[pos2])),"caracteres"))
-        logger(i, tipo = 0)
-        return
-    elif len(battery[pos1]) < len(battery[pos2]):
-        i = " ".join(("Texto",str(pos2),"es mayor que el texto",str(pos1),"en:",str(len(battery[pos2])-len(battery[pos1])),"caracteres"))
-        logger(i, tipo = 0)
-        return
-    else:
-        i = " ".join(("Texto",str(pos1),"y texto",str(pos2),"son iguales en tamaño con",str(len(battery[pos1])),"caracteres"))
-        logger(i, tipo=0)
-        return
-
-#añade un texto
-def addText(battery, text):
-    flag = 1
-    for x in range(10):
-        if battery[x] == "":
-            battery[x] = text
-            res = x
-            flag=0
-            break
-    if flag:
-        while(1):
-            res = input("Texto '",text,"' no ha podido ser añadido, pila esta completa, ¿Desea reemplazar el último espacio de la pila (9) con su nuevo texto?\nTEXTO A REEMPLAZAR:"+battery[-1]+"\n1 - SI\n2 - NO\n>")
-            i = " ".join(("Texto '",str(text),"' no ha podido ser añadido, pila esta completa, ¿Desea reemplazar el último espacio de la pila (9) con su nuevo texto?\nTEXTO A REEMPLAZAR:"+str(battery[-1])+"\n1 - SI\n2 - NO\n>"))
-            logger(i,tipo=-1)
-            logger(res, tipo = 1)
-            # 1 = SI
-            if res == "1":
-                battery[-1] = text
-                logger("== OPERACION REALIZADA ==",tipo = 0)
-                return battery
-            elif res == "2":
-                logger("== OPERACIÓN CANCELADA ==",tipo = 0)
-                return battery
-    else:
-        i = " ".join(("Texto '",str(text),"' almacenado en espacio",str(x)))
-        logger(i,tipo = 0)
-        return battery
-
-#quita un texto
-def delText(battery):
-    flag = 1
-    for x in range(9,-1,-1):
-        if battery[x] != "":
-            i = " ".join(("TEXTO",str(battery[x]),"ELIMINADO"))
-            logger(i, tipo = 0)
-            battery[x] != ""
-            flag = 0
-            break
-    if flag:
-        logger("Pila vacía, no se ha eliminado texto", tipo = 0)
-        return battery
-    return battery
-
-#almacena el estado actual de la pila
-def storeBat(battery):
-    res = ";".join(battery)
-    file = open("bat_savedata.txt", "w")
-    file.write(res)
-    file.close()
-    logger("[Notificación] Pila almacenada en archivo", tipo = 0)
-    return
-
-#menu general
-def menu(battery):
-    logger("Bienvenido al editor de pila!", tipo = 0)
-    battery = loadBat(battery)
-    while(1):
-        res = input("Seleccione operación a realizar:\n1- Ver texto más largo y más corto\n2- Imprimir un texto de la pila\n3- Comparar tamaños de textos en pila\n4- Agregar un texto a la pila\n5- Quitar último texto de la pila\n6- Salir\n>")
-        i = "Seleccione operación a realizar:\n1- Ver texto más largo y más corto\n2- Imprimir un texto de la pila\n3- Comparar tamaños de textos en pila\n4- Agregar un texto a la pila\n5- Quitar último texto de la pila\n6- Salir\n>"
-        logger(i, tipo = -1)
-        logger(res, tipo = 1)
-        if res == "1":
-            majorMinor(battery)
-        elif res == "2":
-            while(1):
-                res1 = input("Indique posición a ver de la pila (0-9)\n10- Volver\n>")
-                i = "Indique posición a ver de la pila (0-9)\n10- Volver\n>"
-                logger(i, tipo = -1)
-                logger(res1, tipo=1)
-                if res1 in [str(x) for x in range(10)]:
-                    seeBat(int(res1), battery)
-                    break
-                elif res1 == "10":
-                    break
-                else:
-                    logger("Indique el valor correcto", tipo = 0)
-        elif res == "3":
-            while(1):
-                res1 = input("Ingrese posición 1 para comparar de la pila (0-9)\n10- Volver\n>")
-                i = "Ingrese posición 1 para comparar de la pila (0-9)\n10- Volver\n>"
-                logger(i, tipo = -1)
-                logger(res1, tipo = 1)
-                if res1 == "10":
-                    break
-                res2 = input("Ingrese posición 2 para comparar de la pila (0-9)\n10- Volver\n>")
-                i = "Ingrese posición 2 para comparar de la pila (0-9)\n10- Volver\n>"
-                logger(i, tipo = -1)
-                logger(res2, tipo = 1)
-                if res2 == "10":
-                    break
-                if (res1 in [str(x) for x in range(10)]) and (res2 in [str(x) for x in range(10)]):
-                    lenCompare(int(res1),int(res2),battery)
-                    break
-                else:
-                    logger("Indique el valor correcto", tipo = 0)
-        elif res == "4":
-            while(1):
-                res1 = input("Ingrese texto a agregar a la pila (dejar vacío para volver)\n>")
-                i = "Ingrese texto a agregar a la pila (dejar vacío para volver)\n>"
-                logger(i, tipo = -1)
-                logger(res1, tipo = 1)
-                if res1 != "":
-                    battery = addText(battery, filterText(res1))
-                    storeBat(battery)
-                    break
-                else:
-                    break
-
-        elif res == "5":
-            while(1):
-                battery = delText(battery)
-                storeBat(battery)
-                break
-        elif res == "6":
-            logger("", reset = 2, tipo = 0)
-            return
-
-battery = []
-logger("", reset = 1, tipo = 0)
-menu(battery)
-
-
+      print("Ingresa las posiciones de los dos textos a comparar (entre 1 y "+str(len(listaSep))+")")
+      while True:
+        pos1 = int(input("Posición 1: "))
+        if pos1 not in list(range(1,len(listaSep)+1)):
+          print("Ingresa una posición válida")
+          logging.warning('Posición 1 inválida')
+        else:
+          break
+      while True:
+        pos2 = int(input("Posición 2: "))
+        if pos1 not in list(range(1,len(listaSep)+1)):
+          print("Ingresa una posición válida")
+          logging.warning('Posición 2 inválida')
+        else:
+          break
+      texto1 = listaSep[pos1 - 1]
+      texto2 = listaSep[pos2 - 1]
+      if len(texto1) > len(texto2):
+          if len(texto1)-len(texto2) == 1:
+              print("El texto "+str(pos1)+": \""+texto1+"\" es mayor en tamaño que el texto "+str(pos2)+": \""+texto2+"\" en "+str(len(texto1)-len(texto2))+" caracter.")
+          else:
+              print("El texto "+str(pos1)+": \""+texto1+"\" es mayor en tamaño que el texto "+str(pos2)+": \""+texto2+"\" en "+str(len(texto1)-len(texto2))+" caracteres.")
+          logging.info("Entrada 1: \""+texto1+"\", Entrada 2: \""+texto2+"\", resultado: Pos1 > Pos2.")
+      elif len(texto2) > len(texto1):
+          if len(texto2)-len(texto1) == 1:
+              print("El texto "+str(pos2)+": \""+texto2+"\" es mayor en tamaño que el texto "+str(pos1)+": \""+texto1+"\" en "+str(len(texto2)-len(texto1))+" caracter.")
+          else:
+              print("El texto "+str(pos2)+": \""+texto2+"\" es mayor en tamaño que el texto "+str(pos1)+": \""+texto1+"\" en "+str(len(texto2)-len(texto1))+" caracteres.") 
+          logging.info("Entrada 1: \""+texto1+"\", Entrada 2: \""+texto2+"\", resultado: Pos2 > Pos1.")
+      elif len(texto1) == len(texto2):
+        print("El texto "+str(pos1)+": \""+texto1+"\" es igual en tamaño que el texto "+str(pos2)+": \""+texto2+"\"")
+        logging.info("Entrada 1: \""+texto1+"\", Entrada 2: \""+texto2+"\", resultado: Pos2 = Pos1.")
+      sleep(4)
+      clear()
+  elif opcion == 6:
+    logging.info("Término de ejecución del programa")
+    break
+  else:
+    clear()
+    print("Ingresa una opción válida.")
+    logging.warning("Opción de interfaz inválida")
+    sleep(1)
+    clear()
