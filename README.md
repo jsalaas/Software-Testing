@@ -27,4 +27,4 @@ You can fork this repo to make advancements or some insights about some problems
 
 ## Licence of the program 🔓
 
-MIT LICENCE
+MIT LICENSE
