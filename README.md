@@ -2,8 +2,7 @@
 
 ## Description: 📜
 
-Executing the creation and apliance of requirements and validations for the development of a program in python, using Case Suites and working with a partner to ensure the correct validation.
-This repository stores the process and final results.
+This repository contains the code programmed to execute the test cases explained in the corresponding documentation for the Software Testing course. In addition, this code is executed by a partner (cross-testing) in order to ensure the validation of the requirements.
 
 ## Pre-requisites 📋
 
@@ -11,18 +10,16 @@ This repository stores the process and final results.
 
 ## Instalation ⚙️
 
-**Before start, I recommend reading the 2 documents included to understand the context behind the python program**
-
-Just clone the repo and then start the program by executing:
-  py PDS1.py
+None of the libraries used require prior installation. Just clone the repo and then start the program by executing: py Tarea1_PDS.py
 
 ## Built with 🛠️
 
-* [VS Code](https://code.visualstudio.com/) - Text Editor
+* [Replit](https://replit.com/) - Browser based IDE
+
 
 ## Authors ✒️
 
-* **Iñaki Oyarzun** - *Designer & programmer* - [MaxGGx](https://github.com/MaxGGx)
+* **Jorge Salas** - *Programmer* - [jsalaas](https://github.com/jsalaas)
 
 ## How to Contribute ➕
 
