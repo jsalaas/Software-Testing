@@ -11,8 +11,9 @@ def clear():
   else:
     _ = os.system('clear')
 
-logging.basicConfig(filename='example.log', encoding='utf-8', level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+logging.basicConfig(filename='accionesResultados.log', encoding='utf-8', level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 print("Bienvenido al gestor de textos en pila")
+logging.info("Inicio de ejecución del programa")
 if not os.path.exists('pila.txt'):
   f = open('pila.txt', 'x')
   f.close()
@@ -64,11 +65,13 @@ while True:
         f.write(lista[i]+' ')
       f.close()
       clear()
+      print("Último elemento de la pila eliminado")
       logging.info('Último elemento de la pila removido (pop).')
       sleep(1)
       clear()      
     else:
       clear()
+      print("Pila vacía. No hay textos para eliminar")
       logging.warning('Pila vacía. No hay textos para eliminar.')
       sleep(2)
       clear()
@@ -105,10 +108,16 @@ while True:
       else:
         clear()
         if indiceMax == indiceMin:
-          print("La pila solamente contiene un texto, por lo que \""+lista[indiceMax]+"\" es el texto más largo y más corto simultaneamente.")
-          logging.info('Se mostró solamente un texto que resulta ser el texto más corto y el más largo a la vez.')
-          sleep(3)
-          clear()
+          if len(lista) == 1:
+            print("La pila solamente contiene un texto, por lo que \""+lista[indiceMax]+"\" es el texto más largo y más corto simultaneamente.")
+            logging.info('Se mostró solamente un texto que resulta ser el texto más corto y el más largo a la vez.')
+            sleep(3)
+            clear()
+          else:
+            print("La pila contiene textos de un solo tamaño. Así, una de estas palabras es \""+lista[indiceMax]+"\".")
+            logging.info('Se mostró solamente un texto que resulta ser el texto más corto y el más largo a la vez.')
+            sleep(3)
+            clear()
         else:
           if largoMax == 1:
             print("Dentro de la pila, el texto mas largo y el mas corto tienen", largoMax, "caracter, dentro de los cuales, uno de ellos es la palabra \""+lista[indiceMax]+"\"")
@@ -128,6 +137,8 @@ while True:
     clear()
     if len(listaSep) == 0:
       logging.warning('Pila vacía. No hay textos para imprimir.')
+      print("La pila se encuentra vacía. Intenta ingresar algunos elementos")
+      sleep(2)
       clear()
     elif len(listaSep) == 1:
       print("El único texto que se encuentra en la pila es: \""+listaSep[0]+"\"")
@@ -154,7 +165,7 @@ while True:
             else:
               break
           print("El texto que se encuentra en la posición", posicion, "de la pila es: \""+listaSep[posicion-1]+"\"")
-          logging.info('Se imprime el elemento '+posicion+' de la pila')
+          logging.info('Se imprime el elemento '+str(posicion)+' de la pila')
           sleep(3)
           clear()
           break
@@ -193,7 +204,7 @@ while True:
           break
       while True:
         pos2 = int(input("Posición 2: "))
-        if pos1 not in list(range(1,len(listaSep)+1)):
+        if pos2 not in list(range(1,len(listaSep)+1)):
           print("Ingresa una posición válida")
           logging.warning('Posición 2 inválida')
         else:
